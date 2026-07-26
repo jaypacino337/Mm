@@ -1,0 +1,30 @@
+# Perpl market-maker configuration.
+# Copy to config.yaml and edit. Secrets go in the environment (see .env.example).
+
+# "testnet" (default, recommended first) or "mainnet"
+network: testnet
+
+# true  -> compute and log quotes only, never send orders
+# false -> live trading (or pass --live / --dry-run on the CLI to override)
+dry_run: true
+
+markets:
+  - symbol: BTC            # market symbol as listed by GET /api/v1/pub/context
+    spread_bps: 10         # full spread: quotes sit ±5 bps around fair price
+    levels: 2              # price levels per side
+    level_step_bps: 5      # distance between consecutive levels
+    order_size: 0.001      # size per level, in base units (BTC here)
+    max_position: 0.005    # hard inventory cap in base units
+    inventory_skew_bps: 5  # quote shift per 100% of max_position held
+    requote_bps: 2.5       # re-quote when fair moves this much
+    min_requote_interval_s: 2.0
+    fair_source: book_mid  # book_mid | mark | last | state_mid
+    leverage: 2            # leverage on opening orders
+    post_only: true        # maker-only: never cross the spread
+    order_ttl_blocks: 600  # orders expire on-chain if the bot dies
+
+  # Add more markets by repeating the block:
+  # - symbol: ETH
+  #   spread_bps: 12
+  #   order_size: 0.01
+  #   max_position: 0.05
