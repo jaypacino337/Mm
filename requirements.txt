@@ -1,4 +1,9 @@
+# Core (Perpl + Arcus + engine)
 websockets>=12.0
 httpx>=0.27
 cryptography>=42.0
 PyYAML>=6.0
+
+# Optional venue SDKs — install the ones you use:
+# pip install phoenix-trade   # Phoenix (Solana spot CLOB)
+# pip install variational     # Variational (RFQ perps)

@@ -3,7 +3,7 @@ import hashlib
 
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
-from perpl_mm.auth import ApiCredentials, load_private_key
+from mmbot.venues.perpl.auth import ApiCredentials, load_private_key
 
 
 SEED = bytes(range(32))

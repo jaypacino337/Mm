@@ -1,30 +1,82 @@
-# Perpl market-maker configuration.
-# Copy to config.yaml and edit. Secrets go in the environment (see .env.example).
+# mmbot configuration — multi-venue market maker.
+# Copy to config.yaml and keep only the venues you actually run.
+# Secrets always come from the environment (see .env.example).
 
-# "testnet" (default, recommended first) or "mainnet"
-network: testnet
-
-# true  -> compute and log quotes only, never send orders
-# false -> live trading (or pass --live / --dry-run on the CLI to override)
+# true  -> compute and log quotes only, never send orders (safe default)
+# false -> live trading (or override per run with --live / --dry-run)
 dry_run: true
 
-markets:
-  - symbol: BTC            # market symbol as listed by GET /api/v1/pub/context
-    spread_bps: 10         # full spread: quotes sit ±5 bps around fair price
-    levels: 2              # price levels per side
-    level_step_bps: 5      # distance between consecutive levels
-    order_size: 0.001      # size per level, in base units (BTC here)
-    max_position: 0.005    # hard inventory cap in base units
-    inventory_skew_bps: 5  # quote shift per 100% of max_position held
-    requote_bps: 2.5       # re-quote when fair moves this much
-    min_requote_interval_s: 2.0
-    fair_source: book_mid  # book_mid | mark | last | state_mid
-    leverage: 2            # leverage on opening orders
-    post_only: true        # maker-only: never cross the spread
-    order_ttl_blocks: 600  # orders expire on-chain if the bot dies
+venues:
+  # ------------------------------------------------ Perpl (perps, Monad)
+  perpl:
+    network: testnet          # testnet | mainnet
+    markets:
+      - symbol: BTC
+        spread_bps: 10
+        levels: 2
+        level_step_bps: 5
+        order_size: 0.001     # base units per level
+        max_position: 0.005   # hard inventory cap
+        inventory_skew_bps: 5
+        requote_bps: 2.5
+        min_requote_interval_s: 2.0
+        fair_source: book_mid # book_mid | mark | last | state_mid
+        leverage: 2
+        post_only: true
+        order_ttl: 600        # blocks
 
-  # Add more markets by repeating the block:
-  # - symbol: ETH
-  #   spread_bps: 12
-  #   order_size: 0.01
-  #   max_position: 0.05
+  # --------------------------------------- Phoenix (spot CLOB, Solana)
+  phoenix:
+    rpc_url: https://api.mainnet-beta.solana.com
+    keypair_path: ~/.config/solana/id.json   # live trading only
+    markets:
+      - symbol: SOL/USDC
+        spread_bps: 8
+        levels: 2
+        level_step_bps: 4
+        order_size: 0.5       # SOL per level
+        max_position: 2.0     # SOL beyond target counts as inventory
+        inventory_skew_bps: 4
+        requote_bps: 2
+        min_requote_interval_s: 3.0
+        order_ttl: 120        # seconds
+        venue:
+          market_pubkey: 4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg
+          target_inventory: 0 # SOL holdings considered "flat"
+
+  # -------------------------------- Variational (RFQ perps) — quote-driven
+  variational:
+    base_url: https://api.testnet.variational.io/v1
+    quote_expiry_s: 30
+    # Settlement pool strategy passed through to the API; see
+    # https://docs.variational.io/for-developers/api
+    pool_strategy:
+      strategy: create_new
+    markets:
+      - symbol: BTC           # matches RFQ instruments containing "btc"
+        spread_bps: 20
+        requote_bps: 5
+      # - symbol: "*"         # quote every RFQ received
+
+  # ------------------- Arcus (perps/stock tokens, Robinhood Chain)
+  # NOTE: endpoint paths & signing need verification against
+  # https://docs.arcus.xyz — see mmbot/venues/arcus.py.
+  arcus:
+    base_url: https://api.arcus.xyz
+    address: "0xYourAddress"  # live trading only
+    account_index: 0
+    markets:
+      - symbol: BTC-PERP
+        spread_bps: 12
+        levels: 2
+        level_step_bps: 6
+        order_size: 0.001
+        max_position: 0.004
+        inventory_skew_bps: 6
+        requote_bps: 3
+        min_requote_interval_s: 2.0
+        post_only: true
+        venue:
+          market_id: 1
+          tick_size: 0.1
+          size_step: 0.0001

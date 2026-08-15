@@ -1,7 +1,7 @@
 [project]
-name = "perpl-mm"
-version = "0.1.0"
-description = "Custom market-making bot for the Perpl perpetual futures DEX on Monad"
+name = "mmbot"
+version = "0.2.0"
+description = "Custom multi-venue market-making bot: Perpl, Phoenix, Variational, Arcus"
 requires-python = ">=3.10"
 dependencies = [
     "websockets>=12.0",
@@ -11,14 +11,17 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+phoenix = ["phoenix-trade>=0.1.9"]
+variational = ["variational>=0.6.0"]
+all = ["phoenix-trade>=0.1.9", "variational>=0.6.0"]
 dev = ["pytest>=8.0"]
 
 [project.scripts]
-perpl-mm = "perpl_mm.__main__:main"
+mmbot = "mmbot.__main__:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["perpl_mm"]
+[tool.setuptools.packages.find]
+include = ["mmbot*"]

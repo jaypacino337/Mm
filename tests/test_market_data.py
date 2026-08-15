@@ -1,4 +1,4 @@
-from perpl_mm.market_data import OrderBook
+from mmbot.venues.perpl.market_data import OrderBook
 
 
 def test_book_snapshot_and_update():
