@@ -11,8 +11,8 @@ therefore overrides `quote_cycle` instead of using the ladder logic:
   3. replace stale quotes when the mid drifts, cancel everything on stop.
 
 Venue settings:
-    base_url:   API base (default testnet: https://api.testnet.variational.io/v1;
-                mainnet: https://api.variational.io/v1)
+    base_url:   API base (default mainnet: https://api.variational.io/v1;
+                testnet: https://api.testnet.variational.io/v1)
     pool_strategy: settlement-pool strategy dict passed through to the SDK,
                 e.g. {strategy: use_existing, pool_id: "..."} — see
                 https://docs.variational.io/for-developers/api
@@ -58,7 +58,7 @@ class VariationalVenue(Venue):
             ) from exc
         self.config = config
         self.market_cfgs = config.markets
-        self.base_url = config.settings.get("base_url", TESTNET_BASE)
+        self.base_url = config.settings.get("base_url", MAINNET_BASE)
         self.pool_strategy: dict[str, Any] = config.settings.get(
             "pool_strategy", {"strategy": "create_new"}
         )

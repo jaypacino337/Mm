@@ -9,7 +9,7 @@ dry_run: true
 venues:
   # ------------------------------------------------ Perpl (perps, Monad)
   perpl:
-    network: testnet          # testnet | mainnet
+    network: mainnet          # mainnet | testnet
     markets:
       - symbol: BTC
         spread_bps: 10
@@ -46,7 +46,7 @@ venues:
 
   # -------------------------------- Variational (RFQ perps) — quote-driven
   variational:
-    base_url: https://api.testnet.variational.io/v1
+    base_url: https://api.variational.io/v1   # mainnet
     quote_expiry_s: 30
     # Settlement pool strategy passed through to the API; see
     # https://docs.variational.io/for-developers/api

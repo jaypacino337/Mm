@@ -31,7 +31,7 @@ class PerplVenue(Venue):
     def __init__(self, config: VenueConfig, dry_run: bool):
         super().__init__(dry_run)
         self.config = config
-        network = config.settings.get("network", "testnet")
+        network = config.settings.get("network", "mainnet")
         if network not in ("mainnet", "testnet"):
             raise ValueError(f"perpl network must be mainnet|testnet, got {network!r}")
         self.rest_url = protocol.MAINNET_REST if network == "mainnet" else protocol.TESTNET_REST
