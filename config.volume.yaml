@@ -1,0 +1,78 @@
+# Volume-focused preset: tight spreads, single level, fast re-quotes,
+# small position caps so inventory recycles quickly. This maximizes
+# genuine maker turnover — quotes rest post-only and are filled by real
+# counterparties. (The bot never self-matches; wash trading is not
+# supported and is banned by every venue here.)
+#
+# ECONOMICS: each round trip costs roughly (taker's spread you earn)
+# minus 2x your maker fee. Keep spread_bps comfortably above 2x the
+# maker fee (negative maker fees / rebates let you quote tighter).
+# Tighter spread => more fills => more volume, but also more adverse
+# selection. Start with sizes you can afford to churn.
+#
+# Run: python -m mmbot --config config.volume.yaml --dry-run   (then --live)
+
+dry_run: true
+
+venues:
+  perpl:
+    network: mainnet
+    markets:
+      - symbol: BTC
+        spread_bps: 4          # tight — check Perpl maker fee first
+        levels: 1
+        order_size: 0.001
+        max_position: 0.002    # small cap -> inventory flips fast
+        inventory_skew_bps: 8  # strong skew -> lean hard to get flat
+        requote_bps: 1
+        min_requote_interval_s: 1.0
+        fair_source: book_mid
+        leverage: 2
+        post_only: true
+        order_ttl: 300
+
+  phoenix:
+    rpc_url: https://api.mainnet-beta.solana.com
+    keypair_path: ~/.config/solana/id.json
+    markets:
+      - symbol: SOL/USDC
+        spread_bps: 4
+        levels: 1
+        order_size: 0.5
+        max_position: 1.0
+        inventory_skew_bps: 8
+        requote_bps: 1
+        min_requote_interval_s: 2.0   # each requote is a Solana tx — mind fees
+        order_ttl: 60
+        venue:
+          market_pubkey: 4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg
+          target_inventory: 0
+
+  variational:
+    base_url: https://api.variational.io/v1
+    quote_expiry_s: 20
+    pool_strategy:
+      strategy: create_new
+    markets:
+      - symbol: "*"            # quote every RFQ received, tightly
+        spread_bps: 10
+        requote_bps: 2
+
+  arcus:
+    base_url: https://api.arcus.xyz
+    address: "0xYourAddress"
+    account_index: 0
+    markets:
+      - symbol: BTC-PERP
+        spread_bps: 5
+        levels: 1
+        order_size: 0.001
+        max_position: 0.002
+        inventory_skew_bps: 8
+        requote_bps: 1
+        min_requote_interval_s: 1.0
+        post_only: true
+        venue:
+          market_id: 1
+          tick_size: 0.1
+          size_step: 0.0001

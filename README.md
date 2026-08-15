@@ -54,6 +54,19 @@ python -m mmbot --dry-run --venue perpl
 python -m mmbot --config config.yaml --live
 ```
 
+### Volume-focused preset
+
+`config.volume.yaml` is a ready-made preset for maximizing genuine maker
+turnover: single-level tight quotes, fast re-quotes, small position caps
+with strong skew so inventory recycles. Check each venue's maker fee and
+keep `spread_bps` above twice it. The bot only ever rests post-only
+quotes filled by real counterparties — it does not and will not
+self-match (wash trading is banned on all of these venues).
+
+```bash
+python -m mmbot --config config.volume.yaml --dry-run
+```
+
 ## Strategy parameters (per market)
 
 | Key | Meaning |
