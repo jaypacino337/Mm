@@ -7,7 +7,7 @@ def test_example_config_loads():
     cfg = load_config("config.example.yaml")
     assert cfg.dry_run is True
     names = [v.name for v in cfg.venues]
-    assert names == ["perpl", "phoenix", "variational", "arcus"]
+    assert names == ["perpl", "lighter", "phoenix", "variational", "arcus"]
     phoenix = next(v for v in cfg.venues if v.name == "phoenix")
     m = phoenix.markets[0]
     assert m.symbol == "SOL/USDC"

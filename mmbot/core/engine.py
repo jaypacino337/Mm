@@ -7,9 +7,12 @@ import logging
 from dataclasses import dataclass, field
 
 from .config import BotConfig, MarketConfig, VenueConfig
+from .stats import StatsTracker
 from .venue import Venue
 
 log = logging.getLogger(__name__)
+
+STATS_INTERVAL_S = 60.0
 
 
 @dataclass
@@ -32,6 +35,9 @@ class Engine:
             VenueRuntime(venue=v, config=vc, states={m.symbol: MarketState() for m in vc.markets})
             for v, vc in venues
         ]
+        self.stats = StatsTracker()
+        for rt in self.runtimes:
+            rt.venue.stats = self.stats
         self._stop = asyncio.Event()
 
     def stop(self) -> None:
@@ -44,13 +50,24 @@ class Engine:
                 await rt.venue.start()
                 started.append(rt)
                 log.info("venue %s started (%d markets)", rt.venue.name, len(rt.config.markets))
-            await asyncio.gather(*(self._venue_loop(rt) for rt in self.runtimes))
+            await asyncio.gather(
+                *(self._venue_loop(rt) for rt in self.runtimes),
+                self._stats_loop(),
+            )
         finally:
+            self.stats.log_summary()
             for rt in started:
                 try:
                     await rt.venue.stop()
                 except Exception:  # noqa: BLE001
                     log.exception("venue %s: shutdown failed", rt.venue.name)
+
+    async def _stats_loop(self) -> None:
+        while not self._stop.is_set():
+            try:
+                await asyncio.wait_for(self._stop.wait(), timeout=STATS_INTERVAL_S)
+            except asyncio.TimeoutError:
+                self.stats.log_summary()
 
     async def _venue_loop(self, rt: VenueRuntime) -> None:
         interval = min(m.min_requote_interval_s for m in rt.config.markets)

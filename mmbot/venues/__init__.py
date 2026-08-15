@@ -24,4 +24,10 @@ def create_venue(config: VenueConfig, dry_run: bool) -> Venue:
         from .arcus import ArcusVenue
 
         return ArcusVenue(config, dry_run)
-    raise ValueError(f"unknown venue {config.name!r} (perpl, phoenix, variational, arcus)")
+    if name == "lighter":
+        from .lighter import LighterVenue
+
+        return LighterVenue(config, dry_run)
+    raise ValueError(
+        f"unknown venue {config.name!r} (perpl, phoenix, variational, arcus, lighter)"
+    )

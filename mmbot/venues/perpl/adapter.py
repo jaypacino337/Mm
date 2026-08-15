@@ -68,8 +68,30 @@ class PerplVenue(Venue):
         self._tasks.append(asyncio.create_task(self.market_data.run(), name="perpl-md"))
         if not self.dry_run:
             self.trading = TradingClient(self.ws_url, self.chain_id, credentials)
+            self.trading.on_fill = self._record_fill
             self._tasks.append(asyncio.create_task(self.trading.run(), name="perpl-trading"))
             await asyncio.wait_for(self.trading.ready.wait(), timeout=60)
+
+    def _record_fill(self, fill: dict) -> None:
+        """Feed FillsUpdate events into the session stats tracker."""
+        if self.stats is None:
+            return
+        order = self.trading.open_orders.get(int(fill.get("id", -1)))
+        if order is None:
+            return  # order already gone; cannot attribute market/side
+        info = next(
+            (m for m in self.markets.values() if m.market_id == order.market_id), None
+        )
+        if info is None:
+            return
+        # Fee units on the wire are venue-internal; tracked as 0 for now.
+        self.stats.record_fill(
+            self.name,
+            info.symbol,
+            Side.BUY if order.is_bid else Side.SELL,
+            unscale(int(fill.get("p", order.price)), info.price_decimals),
+            unscale(int(fill.get("s", 0)), info.size_decimals),
+        )
 
     async def stop(self) -> None:
         if self.trading and self.trading.ready.is_set():

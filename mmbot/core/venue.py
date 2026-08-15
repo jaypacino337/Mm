@@ -59,6 +59,9 @@ class Venue(ABC):
 
     def __init__(self, dry_run: bool = True):
         self.dry_run = dry_run
+        # Session StatsTracker, attached by the engine; adapters that see
+        # fills report them via self.stats.record_fill(...).
+        self.stats = None
 
     # ------------------------------------------------------------ lifecycle
 

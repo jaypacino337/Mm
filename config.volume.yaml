@@ -31,6 +31,22 @@ venues:
         post_only: true
         order_ttl: 300
 
+  # Lighter runs points campaigns rewarding real maker volume — the
+  # original inspiration for this preset.
+  lighter:
+    network: mainnet
+    # account_index: 123      # or env LIGHTER_ACCOUNT_INDEX
+    markets:
+      - symbol: BTC
+        spread_bps: 3          # Lighter maker fee is ~0 — tight is viable
+        levels: 1
+        order_size: 0.001
+        max_position: 0.002
+        inventory_skew_bps: 8
+        requote_bps: 1
+        min_requote_interval_s: 1.0
+        post_only: true
+
   phoenix:
     rpc_url: https://api.mainnet-beta.solana.com
     keypair_path: ~/.config/solana/id.json

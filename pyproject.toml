@@ -13,7 +13,8 @@ dependencies = [
 [project.optional-dependencies]
 phoenix = ["phoenix-trade>=0.1.9"]
 variational = ["variational>=0.6.0"]
-all = ["phoenix-trade>=0.1.9", "variational>=0.6.0"]
+lighter = ["lighter-sdk>=1.1.2"]
+all = ["phoenix-trade>=0.1.9", "variational>=0.6.0", "lighter-sdk>=1.1.2"]
 dev = ["pytest>=8.0"]
 
 [project.scripts]

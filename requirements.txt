@@ -7,3 +7,4 @@ PyYAML>=6.0
 # Optional venue SDKs — install the ones you use:
 # pip install phoenix-trade   # Phoenix (Solana spot CLOB)
 # pip install variational     # Variational (RFQ perps)
+# pip install lighter-sdk     # Lighter (zk perps CLOB)

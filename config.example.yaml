@@ -25,6 +25,23 @@ venues:
         post_only: true
         order_ttl: 600        # blocks
 
+  # ---------------------------------------- Lighter (zk perps CLOB)
+  lighter:
+    network: mainnet          # mainnet | testnet
+    # account_index: 123      # or env LIGHTER_ACCOUNT_INDEX
+    api_key_index: 0
+    markets:
+      - symbol: BTC
+        spread_bps: 6
+        levels: 2
+        level_step_bps: 3
+        order_size: 0.001
+        max_position: 0.004
+        inventory_skew_bps: 5
+        requote_bps: 2
+        min_requote_interval_s: 2.0
+        post_only: true
+
   # --------------------------------------- Phoenix (spot CLOB, Solana)
   phoenix:
     rpc_url: https://api.mainnet-beta.solana.com

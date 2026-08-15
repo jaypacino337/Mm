@@ -1,10 +1,11 @@
 # mmbot — custom multi-venue market-making bot
 
-One configurable market maker, four venues:
+One configurable market maker, five venues:
 
 | Venue | What it is | Integration | Status |
 |-------|------------|-------------|--------|
 | [Perpl](https://perpl.xyz) | Perps CLOB on Monad | Native WS protocol ([api-docs](https://github.com/PerplFoundation/api-docs)), Ed25519-signed | Full |
+| [Lighter](https://lighter.xyz) | zk perps CLOB | Official [`lighter-sdk`](https://pypi.org/project/lighter-sdk/) | Full |
 | [Phoenix](https://www.ellipsislabs.xyz/) | Spot CLOB on Solana | Official [`phoenix-trade`](https://github.com/Ellipsis-Labs/phoenix-sdk) SDK | Full |
 | [Variational](https://www.variational.io) | RFQ-based perps | Official [`variational`](https://pypi.org/project/variational/) SDK | Full (RFQ-maker mode) |
 | [Arcus](https://arcus.xyz) | Perps + stock tokens on Robinhood Chain | Ed25519-signed REST | Best-effort — verify endpoints against [docs.arcus.xyz](https://docs.arcus.xyz) (see header of `mmbot/venues/arcus.py`) |
@@ -32,6 +33,7 @@ pip install -r requirements.txt
 # per-venue SDKs, only for the venues you run:
 pip install phoenix-trade    # Phoenix
 pip install variational      # Variational
+pip install lighter-sdk      # Lighter
 
 cp config.example.yaml config.yaml   # keep only the venues you want
 cp .env.example .env                 # secrets for live trading
@@ -67,6 +69,15 @@ self-match (wash trading is banned on all of these venues).
 python -m mmbot --config config.volume.yaml --dry-run
 ```
 
+### Session stats
+
+The engine tracks every observed fill and logs a scorecard each minute
+(also written to `stats.json`): quote volume traded, realized PnL
+(average-cost), fees, and fill count — so a volume-farming run can be
+judged the way it deserves: volume pushed vs. PnL given up. Fills are
+currently captured on venues that stream them (Perpl); other venues show
+volume in their own UIs/points dashboards.
+
 ## Strategy parameters (per market)
 
 | Key | Meaning |
@@ -100,6 +111,7 @@ mmbot/
     config.py     # multi-venue YAML config
   venues/
     perpl/        # native protocol client (auth, REST, market-data & trading WS)
+    lighter.py    # lighter-sdk adapter (zk perps)
     phoenix.py    # phoenix-trade SDK adapter (spot)
     variational.py# RFQ-maker adapter (overrides the quote cycle)
     arcus.py      # signed-REST adapter (endpoints configurable)
